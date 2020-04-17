@@ -5,9 +5,8 @@
  */
 package com.marconivr.gestionemicroblog.controller;
 
-
 import com.marconivr.gestionemicroblog.domain.Persona;
-import java.net.URI;
+import com.marconivr.gestionemicroblog.domain.Post;
 import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
@@ -25,6 +24,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import com.marconivr.gestionemicroblog.service.PersonaService;
+import com.marconivr.gestionemicroblog.service.PostService;
 
 /**
  *
@@ -32,55 +32,101 @@ import com.marconivr.gestionemicroblog.service.PersonaService;
  */
 @org.springframework.web.bind.annotation.RestController
 public class RestController {
+
     @Autowired
     PersonaService personaService;
+
+    @Autowired
+    PostService postService;
 
     @RequestMapping("/hello")
     public String sayHello() {
         return "Hello everyone!";
     }
-    
+
     @RequestMapping(value = "/persone", method = GET)
     @CrossOrigin(origins = "*", allowedHeaders = "*")
-    public ResponseEntity<JsonResponseBody> getPersone(){
-        return ResponseEntity.status(HttpStatus.OK).body(new JsonResponseBody(HttpStatus.OK.value(),personaService.getPersone()));
+    public ResponseEntity<JsonResponseBody> getPersone() {
+        return ResponseEntity.status(HttpStatus.OK).body(new JsonResponseBody(HttpStatus.OK.value(), personaService.getPersone()));
     }
-    
+
     @RequestMapping(value = "/persone/{id}", method = GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<JsonResponseBody> getPersona(@PathVariable(value="id") int id ){
+    public ResponseEntity<JsonResponseBody> getPersona(@PathVariable(value = "id") int id) {
         Optional<Persona> personaOp = personaService.getPersonaById(id);
         if (personaOp.isPresent()) {
-          return ResponseEntity.status(HttpStatus.OK).body(new JsonResponseBody(HttpStatus.OK.value(),personaService.getPersonaById(id)));
+            return ResponseEntity.status(HttpStatus.OK).body(new JsonResponseBody(HttpStatus.OK.value(), personaService.getPersonaById(id)));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new JsonResponseBody(HttpStatus.NOT_FOUND.value(), null));
         }
-        else 
-          return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new JsonResponseBody(HttpStatus.NOT_FOUND.value(),null));
     }
-    
+
     @RequestMapping(value = "/persone", method = POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin(origins = "*", allowedHeaders = "*")
-    public ResponseEntity<JsonResponseBody> addPersona(HttpServletRequest request, @RequestBody Persona persona){
+    public ResponseEntity<JsonResponseBody> addPersona(HttpServletRequest request, @RequestBody Persona persona) {
         Persona p = personaService.savePersona(persona);
         //da migliorare l'implementazione di HATEOS utilizzando il supporto in Spring; Da implementare la validazione dell'oggetto studente in input
-      return ResponseEntity.status(HttpStatus.CREATED).header("location",request.getRequestURL().toString() + "/"+ p.getId()).body(new JsonResponseBody(HttpStatus.CREATED.value(),null));
+        return ResponseEntity.status(HttpStatus.CREATED).header("location", request.getRequestURL().toString() + "/" + p.getId()).body(new JsonResponseBody(HttpStatus.CREATED.value(), null));
     }
-    
+
     @RequestMapping(value = "/persone/{id}", method = DELETE)
     @CrossOrigin(origins = "*", allowedHeaders = "*")
-    public ResponseEntity<JsonResponseBody> deletePersona(@PathVariable(value="id") int id){
+    public ResponseEntity<JsonResponseBody> deletePersona(@PathVariable(value = "id") int id) {
         Optional<Persona> personaOp = personaService.getPersonaById(id);
         if (personaOp.isPresent()) {
             personaService.deletePersonaById(id);  //se presente, cancello
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new JsonResponseBody(HttpStatus.NO_CONTENT.value(), null));
-        }     
-        else return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new JsonResponseBody(HttpStatus.NOT_FOUND.value(),"Utente non presente."));      
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new JsonResponseBody(HttpStatus.NOT_FOUND.value(), "Utente non presente."));
+        }
     }
+
+    ////////////////////////////////////////////////////////////////////////////
     
+    @RequestMapping(value = "/posts", method = GET)
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public ResponseEntity<JsonResponseBody> getPosts() {
+        return ResponseEntity.status(HttpStatus.OK).body(new JsonResponseBody(HttpStatus.OK.value(), postService.getPosts()));
+    }
+
+    @RequestMapping(value = "/posts/{id}", method = GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<JsonResponseBody> getPost(@PathVariable(value = "id") int id) {
+        Optional<Post> postOp = postService.getPostById(id);
+        if (postOp.isPresent()) {
+            return ResponseEntity.status(HttpStatus.OK).body(new JsonResponseBody(HttpStatus.OK.value(), postService.getPostById(id)));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new JsonResponseBody(HttpStatus.NOT_FOUND.value(), null));
+        }
+    }
+
+    @RequestMapping(value = "/posts", method = POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public ResponseEntity<JsonResponseBody> addPost(HttpServletRequest request, @RequestBody Post post) {
+        Post p = postService.savePost(post);
+        //da migliorare l'implementazione di HATEOS utilizzando il supporto in Spring; Da implementare la validazione dell'oggetto studente in input
+        return ResponseEntity.status(HttpStatus.CREATED).header("location", request.getRequestURL().toString() + "/" + p.getId()).body(new JsonResponseBody(HttpStatus.CREATED.value(), null));
+    }
+
+    @RequestMapping(value = "/posts/{id}", method = DELETE)
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public ResponseEntity<JsonResponseBody> deletePost(@PathVariable(value = "id") int id) {
+        Optional<Post> postOp = postService.getPostById(id);
+        if (postOp.isPresent()) {
+            postService.deletePostById(id);  //se presente, cancello
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new JsonResponseBody(HttpStatus.NO_CONTENT.value(), null));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new JsonResponseBody(HttpStatus.NOT_FOUND.value(), "Post non presente."));
+        }
+    }
+
     //----------Definizione JsonResponseBody----------
-    @AllArgsConstructor 
-    class JsonResponseBody{
-        @Getter @Setter
+    @AllArgsConstructor
+    class JsonResponseBody {
+
+        @Getter
+        @Setter
         private int server;
-        @Getter @Setter
+        @Getter
+        @Setter
         private Object response;
     }
     //------------------------------------------------
