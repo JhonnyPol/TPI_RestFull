@@ -1,0 +1,105 @@
+<html>
+    <head> <title>Posts</title>
+        <script>
+            function loadPosts() {
+                xhr = new XMLHttpRequest();
+                var url = "http://localhost:8080/posts";
+                xhr.onreadystatechange = function () {
+                    if (this.readyState === 4 && this.status === 200) {
+                        decode_json_posts(this.responseText);
+                        document.getElementById("messages").innerHTML = "Operazione eseguita.";
+                    }
+                };
+                xhr.open("GET", url, true);
+                xhr.send();
+            }
+
+            function decode_json_posts(data) {
+                var r = "";
+                var parsedJson = JSON.parse(data);
+                for (var i = 0; i < parsedJson.response.length; i++) {
+                    r += (parsedJson.response[i].titolo + " " + parsedJson.response[i].testo + " " + parsedJson.response[i].dataOra +
+                            " <button onclick='deletePosts(" + parsedJson.response[i].id +
+                            ");'>Cancella</button> <br>"); //delete al momento non implementata lato server
+                }
+                document.getElementById("posts").innerHTML = r;
+            }
+
+            function deletePosts(id) {
+                xhr = new XMLHttpRequest();
+                var url = "http://localhost:8080/posts/" + id;
+                xhr.open("DELETE", url, true);
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4) {
+                        switch (xhr.status) {
+                            case 204:
+                                //document.getElementById("messages").innerHTML = "Cancellato";
+                                loadPosts(); //se cancellato ricarico la lista degli posts
+                                break;
+                            case 404:
+                                document.getElementById("messages").innerHTML = "Errore 404";
+                                break;
+                            default:
+                                document.getElementById("messages").innerHTML = "Non eseguito.";
+                        }
+                    }
+                };
+                xhr.send();
+            }
+
+
+
+            function insertPost() {
+                xhr = new XMLHttpRequest();
+                var url = "http://localhost:8080/posts";
+                xhr.open('POST', url, true);
+                xhr.setRequestHeader("Content-type", "application/json");
+                xhr.withCredentials = false;
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4) {
+                        switch (xhr.status) {
+                            case 201:
+                                // var frm = document.querySelector('[name="f1"]');
+                                document.getElementById("titolo").value = "";
+                                document.getElementById("testo").value = "";
+                                document.getElementById("dataora").value = "";
+                                // var location = xhr.getResponseHeader('location'); da implementare
+                                // document.getElementById("messages").innerHTML = "Inserimento eseguito.";
+                                loadPosts(); //se inserito ricarico la lista dei posts
+                                break;
+                            case 404:
+                                document.getElementById("messages").innerHTML = "Errore 404 ";
+                                break;
+                            default:
+                                document.getElementById("messages").innerHTML = "Non eseguito.";
+                        }
+                    }
+                };
+
+                // var frm = document.querySelector('[name="f1"]');
+                //   var data = JSON.stringify({"cognome":frm.elements["cognome"].value,
+                //                           "nome":frm.elements["nome"].value,
+                //                           "classe":frm.elements["classe"].value 
+                //   });
+                var data = JSON.stringify({"titolo": document.getElementById("titolo").value,
+                    "testo": document.getElementById("testo").value,
+                    "dataora": document.getElementById("dataora").value
+                });
+                xhr.send(data);
+            }
+        </script>
+    </head>
+
+    <body onload="loadPosts();">
+        <a href="index.html"> Menu </a><br> 
+        <button onclick="loadPosts();">Carica posts (esegue una GET sulla collezione /posts)</button>
+        <p id="messages"></p> <br>
+        <!-- form name="f1"  accept-charset="utf-8" -->
+        <label for="Titolo">Titolo:</label>  <input type="text" name="titolo" id="titolo"></br>
+        <label for="Testo">Testo:</label>  <input type="text" name="testo" id="testo"></br>
+        <label for="DataOra">DataOra:</label>  <input type="text" name="dataora"  id="dataora"></br>
+        <button onClick="insertPost();"> Inserisci </button>
+        <!-- /form -->   
+        <div id="posts"></div>
+    </body>
+</html>

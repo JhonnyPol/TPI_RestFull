@@ -1,0 +1,105 @@
+<html>
+    <head> <title>Utenti</title>
+        <script>
+            function loadPersone() {
+                xhr = new XMLHttpRequest();
+                var url = "http://localhost:8080/persone";
+                xhr.onreadystatechange = function () {
+                    if (this.readyState === 4 && this.status === 200) {
+                        decode_json_pers(this.responseText);
+                        document.getElementById("messages").innerHTML = "Operazione eseguita.";
+                    }
+                };
+                xhr.open("GET", url, true);
+                xhr.send();
+            }
+
+            function decode_json_pers(data) {
+                var r = "";
+                var parsedJson = JSON.parse(data);
+                for (var i = 0; i < parsedJson.response.length; i++) {
+                    r += (parsedJson.response[i].username + " " + parsedJson.response[i].password + " " + parsedJson.response[i].mail +
+                            " <button onclick='deletePersone(" + parsedJson.response[i].id +
+                            ");'>Cancella</button> <br>"); //delete al momento non implementata lato server
+                }
+                document.getElementById("persone").innerHTML = r;
+            }
+
+            function deletePersone(id) {
+                xhr = new XMLHttpRequest();
+                var url = "http://localhost:8080/persone/" + id;
+                xhr.open("DELETE", url, true);
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4) {
+                        switch (xhr.status) {
+                            case 204:
+                                //document.getElementById("messages").innerHTML = "Cancellato";
+                                loadPersone(); //se cancellato ricarico la lista degli utenti
+                                break;
+                            case 404:
+                                document.getElementById("messages").innerHTML = "Errore 404";
+                                break;
+                            default:
+                                document.getElementById("messages").innerHTML = "Non eseguito.";
+                        }
+                    }
+                };
+                xhr.send();
+            }
+
+
+
+            function insertPerson() {
+                xhr = new XMLHttpRequest();
+                var url = "http://localhost:8080/persone";
+                xhr.open('POST', url, true);
+                xhr.setRequestHeader("Content-type", "application/json");
+                xhr.withCredentials = false;
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4) {
+                        switch (xhr.status) {
+                            case 201:
+                                // var frm = document.querySelector('[name="f1"]');
+                                document.getElementById("username").value = "";
+                                document.getElementById("password").value = "";
+                                document.getElementById("mail").value = "";
+                                // var location = xhr.getResponseHeader('location'); da implementare
+                                // document.getElementById("messages").innerHTML = "Inserimento eseguito.";
+                                loadPersone(); //se inserito ricarico la lista degli utenti
+                                break;
+                            case 404:
+                                document.getElementById("messages").innerHTML = "Errore 404 ";
+                                break;
+                            default:
+                                document.getElementById("messages").innerHTML = "Non eseguito.";
+                        }
+                    }
+                };
+
+                // var frm = document.querySelector('[name="f1"]');
+                //   var data = JSON.stringify({"cognome":frm.elements["cognome"].value,
+                //                           "nome":frm.elements["nome"].value,
+                //                           "classe":frm.elements["classe"].value 
+                //   });
+                var data = JSON.stringify({"username": document.getElementById("username").value,
+                    "password": document.getElementById("password").value,
+                    "mail": document.getElementById("mail").value
+                });
+                xhr.send(data);
+            }
+        </script>
+    </head>
+
+    <body onload="loadPersone();">
+        <a href="index.html"> Menu </a><br> 
+        <button onclick="loadPersone();">Carica utenti (esegue una GET sulla collezione /persone)</button>
+        <p id="messages"></p> <br>
+        <!-- form name="f1"  accept-charset="utf-8" -->
+        <label for="Username">Username:</label>  <input type="text" name="username" id="username"></br>
+        <label for="Password">Password:</label>  <input type="text" name="password" id="password"></br>
+        <label for="Mail">Mail:</label>  <input type="text" name="mail"  id="mail"></br>
+        <button onClick="insertPerson();"> Inserisci </button>
+        <!-- /form -->   
+        <div id="persone"></div>
+    </body>
+</html>
