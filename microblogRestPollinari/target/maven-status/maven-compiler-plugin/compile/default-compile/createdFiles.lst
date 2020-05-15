@@ -1,0 +1,13 @@
+com\pollinari\microblog\dao\PostDao.class
+com\pollinari\microblog\dao\CommentoDao.class
+com\pollinari\microblog\MicroBlogApplication.class
+com\pollinari\microblog\controller\UtenteController.class
+com\pollinari\microblog\dao\UtenteDao.class
+com\pollinari\microblog\entities\Utente.class
+com\pollinari\microblog\entities\Commento.class
+com\pollinari\microblog\controller\PostController.class
+com\pollinari\microblog\dao\AmministratoreDao.class
+com\pollinari\microblog\controller\CommentoController.class
+com\pollinari\microblog\entities\Amministratore.class
+com\pollinari\microblog\controller\AmministratoreController.class
+com\pollinari\microblog\entities\Post.class
