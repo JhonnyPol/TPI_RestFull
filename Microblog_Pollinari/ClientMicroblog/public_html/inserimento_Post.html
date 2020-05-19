@@ -1,0 +1,31 @@
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <title>Microblog</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="APP.js"></script>
+    </head>
+    <body>
+        <div class="home_button">
+            <a href="index.html">
+                <img alt="" src="img/home.png">
+            </a>        
+        </div>
+
+        <h1> Inserimento Post </h1><br>
+        <label for="titolo">Titolo</label><br>
+        <input type="text" id="titolo" name="titolo" placeholder="Titolo" required><br><br>
+        <label for="testo">Testo</label><br>
+        <input type="text" id="testo" name="testo" placeholder="Testo" required><br><br><br>
+        <input class="button" type="submit" id="inserisci" value="INSERISCI"><br><br><br><br>
+        <script>
+            //init APP
+            $(document).ready(function () {
+                $("#inserisci").on("click", APP.insertPost);
+            });
+        </script>
+
+    </body>
+</html>

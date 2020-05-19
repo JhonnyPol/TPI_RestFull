@@ -1,0 +1,33 @@
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <title>Microblog</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="APP.js"></script>
+    </head>
+
+    <body>
+        <div class="home_button">
+            <a href="index.html">
+                <img alt="" src="img/home.png">
+            </a>        
+        </div>
+
+        <h1> Login Amministratore </h1><br>
+
+        <label for="username">Username</label><br>
+        <input type="text" id="username" name="username" placeholder="Username"><br><br>
+        <label for="password">Password</label><br>
+        <input type="password" id="password" name="password" placeholder="Password"><br><br><br>
+        <input class="button" type="submit" value="LOGIN" id="submit"><br><br><br><br>
+        <script>
+            //init APP
+            $(document).ready(function () {
+                $("#submit").on("click", APP.getAmministratore);
+            });
+        </script>
+
+    </body>
+</html>
