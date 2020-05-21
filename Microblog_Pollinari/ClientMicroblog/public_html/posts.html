@@ -1,5 +1,40 @@
-<!--
-uguale a posts_Utente ma senza bottone Add
+<html>
+    <head>    
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <title>Microblog</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="APP.js"></script>
+    </head>
+    <body>
+        <div class="home_button">
+            <a href="index.html">
+                <img alt="" src="img/home.png">
+            </a>        
+        </div>
 
-Per gli utenti non registrati (e l'amministratore? può o non può aggiungere commenti?)
--->
+        <h1> Posts </h1>
+        <table align="center" id='posts'>
+
+        </table>
+
+        <div>
+            <h1> Commenti </h1>
+            <table align="center" id='commenti'>
+
+            </table>
+
+        </div>
+
+        <div id="insertCommenti">
+        </div>
+
+        <script>
+            $(document).ready(function () {
+                APP.getPosts();
+            });
+        </script>
+
+    </body>
+</html>

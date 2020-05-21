@@ -1,25 +1,5 @@
 var APP = {
-    setCookie: function (cname, cvalue, exdays) {
-        var d = new Date();
-        d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-        var expires = "expires=" + d.toUTCString();
-        document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-    },
-    getCookie: function (cname) {
-        var name = cname + "=";
-        var decodedCookie = decodeURIComponent(document.cookie);
-        var ca = decodedCookie.split(';');
-        for (var i = 0; i < ca.length; i++) {
-            var c = ca[i];
-            while (c.charAt(0) === ' ') {
-                c = c.substring(1);
-            }
-            if (c.indexOf(name) === 0) {
-                return c.substring(name.length, c.length);
-            }
-        }
-        return "";
-    },
+
     getUtente: function ()
     {
         var username = $("#username").val();
@@ -38,8 +18,8 @@ var APP = {
                         },
                         statusCode: {
                             200: function (utente) {
-                                APP.setCookie("idUtente", utente.id);
-                                location.assign("posts_Utente.html");
+                                sessionStorage.setItem("idUtente", utente.id);
+                                location.assign("posts.html");
                             }
                         }
                     }
@@ -64,7 +44,7 @@ var APP = {
                         },
                         statusCode: {
                             200: function (amministratore) {
-                                APP.setCookie("idAmministratore", amministratore.id);
+                                sessionStorage.setItem("idAmministratore", amministratore.id);
                                 location.assign("inserimento_Post.html");
                             }
                         }
@@ -105,7 +85,7 @@ var APP = {
                         },
                         statusCode: {
                             200: function (utente) {
-                                APP.setCookie("idUtente", utente.id);
+                                sessionStorage.setItem("idUtente", utente.id);
                                 location.assign("login_Utente.html");
                             }
                         }
@@ -114,12 +94,12 @@ var APP = {
         }
         ;
     },
-    
+
     insertPost: function ()
     {
         var titolo = $("#titolo").val();
         var testo = $("#testo").val();
-        var idAmministratore = APP.getCookie("idAmministratore");
+        var idAmministratore = sessionStorage.getItem("idAmministratore");
         var date = new Date();
         var month = '' + (date.getMonth() + 1);
         var day = '' + date.getDate();
@@ -188,19 +168,43 @@ var APP = {
                     + '<td>' + titolo + '</td>'
                     + '<td>' + testo + '</td>'
                     + '<td>' + idAmministratore + '</td>'
-                    + '<td>' + '<input class="buttonCommenti" type="submit" id="' + id + '" value="View">' + '</td>'
-                    + '<td>' + '<input class="buttonCommenti" type="submit" id="' + id + '" value="Add">' + '</td>' 
-                    /*Il tasto Add dovrebbe portare a inserimento_Commento.html ma non so come fargli prendere il cookie del post che commenta per prendere l'idPost*/
+                    + '<td>' + '<button class="buttonView" id="' + id + '"> View </button>' + '</td>'
+                    + '<td>' + '<button class="buttonAdd" id="add' + id + '"> Add </button>' + '</td>'
                     + '</tr>';
         }
         document.getElementById("posts").innerHTML = tabellaPosts;
+
+
+        for (i = 0; i < posts.length; i++) {
+            $("#" + posts[i].id).on("click", APP.getCommentibyPostId);
+            $("#add" + posts[i].id).on("click", APP.showAddCommentoDiv);
+        }
+
+
+        APP.checkLogin();
+
     },
-   
-    insertCommento: function ()
+
+    showAddCommentoDiv: function (event)
     {
+        var buttonId = event.target.id;
+        var postId = buttonId.split("add")[1];
+        var divCommenti = '<div id="addCommento' + postId + '">' +
+                '<h1> Inserimento Commento </h1><br>' +
+                '<label for="testo">Commento</label><br>' +
+                '<input type="text" id="testo" name="testo" placeholder="Commento" required><br><br><br>' +
+                '<button class="button" type="submit" id="inserisci' + postId + '">Inserisci</button><br><br><br><br>' +
+                '</div>';
+        document.getElementById("insertCommenti").innerHTML = divCommenti;
+        $("#inserisci" + postId).on("click", APP.insertCommento);
+    },
+
+    insertCommento: function (event)
+    {
+        var buttonId = event.target.id;
+        var idPost = buttonId.split("inserisci")[1];
         var testo = $("#testo").val();
-        var idPost = APP.getCookie("idPost");
-        var idUtente = APP.getCookie("idUtente");
+        var idUtente = sessionStorage.getItem("idUtente");
 
         var commento = JSON.stringify(
                 {
@@ -225,6 +229,21 @@ var APP = {
         );
     },
 
+    getCommentibyPostId: function (event)
+    {
+        var id = event.target.id;
+        var url = "http://localhost:8080/commenti/posts/" + id;
+        $.ajax(
+                {
+                    url: url,
+                    method: "GET",
+                    success: function (data, status) {
+                        APP.showCommenti(data);
+                    }
+                }
+        );
+    },
+
     getCommenti: function ()
     {
         var url = "http://localhost:8080/commenti";
@@ -238,6 +257,7 @@ var APP = {
                 }
         );
     },
+
     showCommenti: function (commenti)
     {
         var tabellaCommenti = '<tr>'
@@ -259,8 +279,26 @@ var APP = {
                     + '</tr>';
         }
         document.getElementById("commenti").innerHTML = tabellaCommenti;
-    }
+    },
 
+    showAddButton: function ()
+    {
+        var buttons = document.getElementsByClassName("buttonAdd");
+
+        for (i = 0; i < buttons.length; i++) {
+            buttons[i].style.display = "block";
+        }
+    },
+
+    checkLogin: function ()
+    {
+        var idUtente = sessionStorage.getItem("idUtente");
+
+        if (idUtente !== null) {
+            APP.showAddButton();
+        }
+
+    }
 
 
 };

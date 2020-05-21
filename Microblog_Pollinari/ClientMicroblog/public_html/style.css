@@ -4,12 +4,6 @@ body{
     font-size: 17px;
 }
 
-.home_button{
-
-    margin-top: 10%;
-
-}
-
 .button{
 
     color: black;
@@ -31,11 +25,12 @@ body{
 }
 
 table, td, th {
-                border-bottom:  1px solid grey;
-                text-align: center;
-                padding: 15px;
-                border-collapse: collapse;    
-            }
+    border-bottom:  1px solid grey;
+    text-align: center;
+    padding: 15px;
+    border-collapse: collapse;    
+}
 
-      
-          
+.buttonAdd{
+    display: none;   
+}     
